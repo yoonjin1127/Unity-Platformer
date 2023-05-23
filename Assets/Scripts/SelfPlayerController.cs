@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -10,6 +11,7 @@ public class SelfPlayerController : MonoBehaviour
     private Vector2 dir;
     private Animator anim;
     private SpriteRenderer render;
+    private bool isGround;
 
     [SerializeField]
     private float maxSpeed;
@@ -17,6 +19,8 @@ public class SelfPlayerController : MonoBehaviour
     private float speed;
     [SerializeField]
     private float jumpPower;
+    [SerializeField]
+    LayerMask groundLayer;
 
     private void Awake()
     {
@@ -28,6 +32,11 @@ public class SelfPlayerController : MonoBehaviour
     private void Update()
     {
         Move();
+    }
+
+    private void FixedUpdate()
+    {
+        GroundCheck();
     }
 
     private void Move()
@@ -45,7 +54,7 @@ public class SelfPlayerController : MonoBehaviour
 
     private void Jump()
     {
-        rb.AddForce(Vector2.up * speed, ForceMode2D.Impulse);
+        rb.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
         anim.SetTrigger("Jump");
     }
 
@@ -68,9 +77,10 @@ public class SelfPlayerController : MonoBehaviour
 
     private void OnJump(InputValue value)
     {
+        if (isGround)
         Jump();
     }
-
+    /*
     private void OnCollisionEnter2D(Collision2D collision)
     {
         anim.SetBool("IsGround", true);
@@ -80,4 +90,33 @@ public class SelfPlayerController : MonoBehaviour
     {
         anim.SetBool("IsGround", false);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        anim.SetBool("IsGround", true);
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        anim.SetBool("IsGround", false);
+    }*/
+
+    private void GroundCheck()
+    { 
+       RaycastHit2D hit = Physics2D.Raycast(transform.position, Vector2.down, 1.5f, groundLayer);
+        if (hit.collider != null)
+        {
+            isGround = true;
+            anim.SetBool("IsGround", true);
+            Debug.DrawRay(transform.position, new Vector3(hit.point.x, hit.point.y) - transform.position, Color.red);
+        }
+
+        else
+        {
+            isGround= false;
+            anim.SetBool("IsGround", false);
+            Debug.DrawRay(transform.position, Vector3.down * 1.5f, Color.green);
+        }
+    }
+
 }
