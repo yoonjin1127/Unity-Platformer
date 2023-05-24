@@ -19,9 +19,11 @@ public class SelfPlayerController : MonoBehaviour
     private float speed;
     [SerializeField]
     private float jumpPower;
+    // 레이어 마스크 설정
     [SerializeField]
     LayerMask groundLayer;
 
+    // 중력, 애니메이션, 랜더링 인스턴스 설정
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -39,6 +41,7 @@ public class SelfPlayerController : MonoBehaviour
         GroundCheck();
     }
 
+    // 이동 함수 구현
     private void Move()
     {
         if (dir.x < 0 && rb.velocity.x > - maxSpeed)
@@ -49,6 +52,11 @@ public class SelfPlayerController : MonoBehaviour
         else if (dir.x > 0 &&  rb.velocity.x < maxSpeed)
         {
             rb.AddForce(Vector2.right * dir.x * speed, ForceMode2D.Force);        
+        }
+
+        else if (dir.y < 0 && rb.velocity.y > -maxSpeed)
+        {
+            rb.AddForce(Vector2.up * dir.y * jumpPower, ForceMode2D.Force);
         }
     }
 
